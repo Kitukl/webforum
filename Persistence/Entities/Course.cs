@@ -6,7 +6,7 @@ public class Course
   public string Title { get; set; } = string.Empty;
   public string Description { get; set; } = string.Empty;
   public User? Creator { get; set; }
-  public List<Lesson> Lessons { get; set; } = new List<Lesson>();
+  public List<Lesson> Lessons { get; set; } = new();
   public List<User> Students { get; set; } = new();
   public List<string> Categories { get; set; } = new();
 }
