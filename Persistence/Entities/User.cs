@@ -1,7 +1,23 @@
+using System.Globalization;
+using Infrastructure.Hasher;
+
 namespace Persistence.Entities;
 
 public class User
 {
+
+  public User(string username, string password, string role)
+  {
+    Id = Guid.NewGuid();
+    Username = username;
+    Password = password;
+    Role = role;
+    CreatedCourses = new();
+    EnrolledCourses = new();
+    Discussions = new();
+    Rating = 5;
+  }
+  
   private double _rating;
   public Guid Id { get; set; }
   public string Username { get; set; } = string.Empty;

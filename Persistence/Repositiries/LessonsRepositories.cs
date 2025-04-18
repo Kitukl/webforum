@@ -6,7 +6,6 @@ namespace Persistence.Repositiries;
 public class LessonsRepositories : ILessonRepositories
 {
   private readonly Context _context;
-  
   public LessonsRepositories(Context context)
   {
     _context = context;

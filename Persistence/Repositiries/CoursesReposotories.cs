@@ -5,6 +5,11 @@ namespace Persistence.Repositiries;
 
 public class CoursesReposotories : ICourseRepositories
 {
+  private readonly Context _context;
+  public CoursesReposotories(Context context)
+  {
+    _context = context;
+  }
   public Task Add(string title, string description,Guid creator, List<Guid> students, List<Guid> lessons, List<string> categories)
   {
     throw new NotImplementedException();

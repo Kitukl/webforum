@@ -5,6 +5,12 @@ namespace Persistence.Repositiries;
 
 public class CommentRepositories : ICommentRepositories
 {
+  private readonly Context _context;
+
+  public CommentRepositories(Context context)
+  {
+    _context = context;
+  }
   public Task Add(Guid creator, Guid discussion, string Content)
   {
     throw new NotImplementedException();
