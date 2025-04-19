@@ -1,7 +1,7 @@
 using Application.Services;
 using Core.Requests;
 using Microsoft.AspNetCore.Mvc;
-using Persistence.Entities;
+using Core.Entities;
 
 namespace WebForumAPI.Controllers;
 
@@ -34,6 +34,7 @@ public class UserController : ControllerBase
   {
     var token = await _userService.Login(user.Username, user.Password);
     if (token == "Incorrect password") return BadRequest(token);
+    HttpContext.Response.Cookies.Append("YUMI", token);
     return Ok(token);
   }
 

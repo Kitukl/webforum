@@ -1,5 +1,5 @@
 using Persistence.Contracts;
-using Persistence.Entities;
+using Core.Entities;
 
 namespace Persistence.Repositiries;
 

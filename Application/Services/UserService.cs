@@ -1,16 +1,18 @@
 using Infrastructure.Hasher;
 using Persistence.Contracts;
-using Persistence.Entities;
+using Core.Entities;
 
 namespace Application.Services;
 
 public class UserService
 {
   private readonly IUserRepositories _userRepositories;
+  private readonly IJWTProvider _jwtProvider;
 
-  public UserService(IUserRepositories userRepositories)
+  public UserService(IUserRepositories userRepositories, IJWTProvider jwtProvider)
   {
     _userRepositories = userRepositories;
+    _jwtProvider = jwtProvider;
   }
 
   public async Task Register(string username, string password, string role)
@@ -23,8 +25,7 @@ public class UserService
   {
     var user = await _userRepositories.GetByUserName(username);
     if (!PasswordHasher.VerifyPassword(password, user.Password)) return "Incorrect password";
-    //To-Do login logic
-    var token = "test";
+    var token = _jwtProvider.GenerateToken(user);
     return token;
   }
 
@@ -48,7 +49,7 @@ public class UserService
   public async Task UpdatePassword(Guid id, string password)
   {
     var hashedPassword = PasswordHasher.HashPassword(password);
-    await _userRepositories.UpdateUsername(id, password);
+    await _userRepositories.UpdateUsername(id, hashedPassword);
   }
   
   public async Task<List<User>> Get()

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Persistence.Configurations;
-using Persistence.Entities;
+using Core.Entities;
 public class Context(DbContextOptions<Context> options): DbContext(options)
 {
   public DbSet<Comment> Comments { get; set; }

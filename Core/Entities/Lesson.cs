@@ -1,4 +1,4 @@
-namespace Persistence.Entities;
+namespace Core.Entities;
 
 public class Lesson
 {

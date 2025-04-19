@@ -1,4 +1,4 @@
-using Persistence.Entities;
+using Core.Entities;
 
 namespace Persistence.Contracts;
 

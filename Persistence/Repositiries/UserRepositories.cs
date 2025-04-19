@@ -1,7 +1,7 @@
 using Infrastructure.Hasher;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contracts;
-using Persistence.Entities;
+using Core.Entities;
 
 namespace Persistence.Repositiries;
 

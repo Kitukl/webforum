@@ -1,7 +1,6 @@
 using System.Globalization;
-using Infrastructure.Hasher;
 
-namespace Persistence.Entities;
+namespace Core.Entities;
 
 public class User
 {
