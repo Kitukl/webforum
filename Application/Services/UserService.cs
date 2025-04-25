@@ -62,4 +62,9 @@ public class UserService
   {
     await _userRepositories.Delete(id);
   }
+
+  public async Task RegisterOnCourse(Guid courseId, Guid userId)
+  {
+    await _userRepositories.RegisterOnCourse(courseId, userId);
+  }
 }

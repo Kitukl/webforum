@@ -9,6 +9,7 @@ public interface IUserRepositories
   public Task<List<User>> Get();
   public Task<User> GetByUserName(string username);
   public Task UpdateUsername(Guid id, string username);
+  public Task RegisterOnCourse(Guid courseId, Guid userId);
   public Task UpdatePassword(Guid id, string password);
   public Task Delete(Guid id);
 }

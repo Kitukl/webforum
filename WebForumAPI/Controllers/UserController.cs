@@ -35,7 +35,7 @@ public class UserController : ControllerBase
     var token = await _userService.Login(user.Username, user.Password);
     if (token == "Incorrect password") return BadRequest(token);
     HttpContext.Response.Cookies.Append("YUMI", token);
-    return Ok(token);
+    return Ok();
   }
 
   [HttpGet("users/id/{id}")]
@@ -71,5 +71,14 @@ public class UserController : ControllerBase
   {
     await _userService.Delete(id);
     return Ok("Delete successfully");
+  }
+
+  [HttpPost("register/user-on-course")]
+  public async Task<ActionResult> RegisterOnCourse(
+    [FromBody] UserRegisterOnCourseRequest userRegisterOnCourseRequest)
+  {
+    await _userService.RegisterOnCourse(userRegisterOnCourseRequest.CourseId,
+      userRegisterOnCourseRequest.UserId);
+    return Ok();
   }
 }

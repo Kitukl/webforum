@@ -31,7 +31,7 @@ public class UserRepositories : IUserRepositories
   {
     return await _context.Users.ToListAsync();
   }
-
+  
   public async Task<User> GetByUserName(string username)
   {
     return await _context.Users
@@ -63,6 +63,27 @@ public class UserRepositories : IUserRepositories
     await _context.Users
       .Where(u => u.Id == id)
       .ExecuteDeleteAsync();
+
+    await _context.SaveChangesAsync();
+  }
+
+  public async Task RegisterOnCourse(Guid courseId, Guid userId)
+  {
+    var user = await _context.Users
+                 .Include(u => u.EnrolledCourses)
+                 .FirstOrDefaultAsync(u => u.Id == userId)
+               ?? throw new Exception("User not found");
+
+    var course = await _context.Courses
+                   .Include(c => c.Students)
+                   .FirstOrDefaultAsync(c => c.Id == courseId)
+                 ?? throw new Exception("Course not found");
+
+    if (user.EnrolledCourses.Any(c => c.Id == courseId))
+      throw new Exception("User already enrolled");
+
+    user.EnrolledCourses.Add(course);
+    course.Students.Add(user);
 
     await _context.SaveChangesAsync();
   }
