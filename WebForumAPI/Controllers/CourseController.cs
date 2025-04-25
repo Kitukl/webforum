@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Application.Services;
 using Core.Entities;
 using Core.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Persistence.Repositiries;
 
@@ -61,6 +63,7 @@ public class CourseController : ControllerBase
     return Ok(courses);
   }
 
+  [Authorize(Roles = "admin, lecture")]
   [HttpPost("add/course")]
   public async Task<ActionResult> Add([FromBody] CourseRequest courseRequest)
   {
@@ -69,31 +72,47 @@ public class CourseController : ControllerBase
     return Created();
   }
 
+  [Authorize]
   [HttpDelete("delete/course/{id}")]
   public async Task<ActionResult> Delete(Guid id)
   {
+    var lectureId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var course = await _courseService.GetById(id);
+    if (course.Creator.Id.ToString() != lectureId) return Forbid();
     await _courseService.Delete(id);
     return Ok();
   }
 
+  [Authorize]
   [HttpPatch("update/courses/title/{id}")]
   public async Task<ActionResult> UpdateTitle([FromRoute] Guid id, [FromBody] CourseUpdateRequest course)
   {
+    var lectureId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var c = await _courseService.GetById(id);
+    if (c.Creator.Id.ToString() != lectureId) return Forbid();
     await _courseService.UpdateTitle(id, course.Text);
     return Ok();
   }
 
+  [Authorize]
   [HttpPatch("update/course/description/{id}")]
   public async Task<ActionResult> UpdateDescription([FromRoute] Guid id, CourseUpdateRequest course)
   {
+    var lectureId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var c = await _courseService.GetById(id);
+    if (c.Creator.Id.ToString() != lectureId) return Forbid();
     await _courseService.UpdateDescription(id, course.Text);
     return Ok();
   }
 
+  [Authorize]
   [HttpPatch("update/course/categories/{id}")]
   public async Task<ActionResult> UpdateCategories([FromRoute] Guid id,
     CourseCategoriesUpdateRequest course)
   {
+    var lectureId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var c = await _courseService.GetById(id);
+    if (c.Creator.Id.ToString() != lectureId) return Forbid();
     await _courseService.UpdateCategories(id, course.Categories);
     return Ok();
   }

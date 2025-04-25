@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Application.Services;
 using Core.Entities;
 using Core.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebForumAPI.Controllers;
@@ -15,6 +17,7 @@ public class LessonController : ControllerBase
   {
     _lessonService = lessonService;
   }
+  [Authorize (Roles = "admin, lecture")]
   [HttpPost("add/lesson")]
   public async Task<ActionResult> Add([FromBody] LessonRequest lessonRequest)
   {
@@ -22,6 +25,7 @@ public class LessonController : ControllerBase
     return Ok();
   }
 
+  [Authorize]
   [HttpGet("lessons/{id}")]
   public async Task<ActionResult<Lesson>> GetById([FromRoute] Guid id)
   {
@@ -33,6 +37,7 @@ public class LessonController : ControllerBase
     return Ok(lesson);
   }
 
+  [Authorize]
   [HttpGet("lessons/by-title")]
   public async Task<ActionResult<Lesson>> GetByTitle([FromBody] string title)
   {
@@ -41,10 +46,18 @@ public class LessonController : ControllerBase
     return Ok(lesson);
   }
 
+  [Authorize]
   [HttpDelete("delete/lesson/{id}")]
   public async Task<ActionResult> Delete([FromRoute] Guid id)
   {
-    await _lessonService.Delete(id);
-    return Ok();
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    var lesson = await _lessonService.GetById(id);
+    if (role == "admin" || userId == lesson.Course.Creator.Id.ToString())
+    {
+      await _lessonService.Delete(id);
+      return Ok();
+    }
+    return Forbid();
   }
 }

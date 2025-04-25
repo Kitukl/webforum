@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Application.Services;
 using Core.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebForumAPI.Controllers;
 
@@ -52,33 +54,64 @@ public class UserController : ControllerBase
     return Ok(user);
   }
 
+  [Authorize]
   [HttpPatch("change/username")]
   public async Task<ActionResult> UpdateUsername([FromBody] UsernameRequest usernameRequest)
   {
-    await _userService.UpdateUsername(usernameRequest.Id, usernameRequest.Username);
-    return Ok($"New username {usernameRequest.Username}");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var user = await _userService.GetById(usernameRequest.Id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == user.Id.ToString())
+    {
+      await _userService.UpdateUsername(usernameRequest.Id, usernameRequest.Username);
+      return Ok($"New username {usernameRequest.Username}"); 
+    }
+    return Forbid();
   }
 
+  [Authorize]
   [HttpPatch("change/password")]
   public async Task<ActionResult> UpdatePassword([FromBody] PasswordRequest passwordRequest)
   {
-    await _userService.UpdatePassword(passwordRequest.Id, passwordRequest.Password);
-    return Ok($"New password!");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var user = await _userService.GetById(passwordRequest.Id);
+    if (userId == user.Id.ToString())
+    {
+      await _userService.UpdatePassword(passwordRequest.Id, passwordRequest.Password);
+      return Ok($"New password!"); 
+    }
+    return Forbid();
   }
   
+  [Authorize]
   [HttpDelete("delete/user")]
   public async Task<ActionResult> Delete(Guid id)
   {
-    await _userService.Delete(id);
-    return Ok("Delete successfully");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    var user = await _userService.GetById(id);
+    if (role == "admin" || userId == user.Id.ToString())
+    {
+      await _userService.Delete(id);
+      return Ok("Delete successfully");
+    }
+    return Forbid();
   }
 
+  [Authorize]
   [HttpPost("register/user-on-course")]
   public async Task<ActionResult> RegisterOnCourse(
     [FromBody] UserRegisterOnCourseRequest userRegisterOnCourseRequest)
   {
-    await _userService.RegisterOnCourse(userRegisterOnCourseRequest.CourseId,
-      userRegisterOnCourseRequest.UserId);
-    return Ok();
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var user = await _userService.GetById(userRegisterOnCourseRequest.UserId);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == user.Id.ToString())
+    {
+      await _userService.RegisterOnCourse(userRegisterOnCourseRequest.CourseId,
+        userRegisterOnCourseRequest.UserId);
+      return Ok(); 
+    }
+    return Forbid();
   }
 }

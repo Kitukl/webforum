@@ -33,6 +33,23 @@ public static class ApiExtensions
             }
           };
         });
-    serviceCollection.AddAuthentication();
+    
+    
+    //Authorization
+    serviceCollection.AddAuthorization(options =>
+    {
+        options.AddPolicy("admin", policy =>
+        {
+          policy.RequireClaim("admin", "true");
+        });
+        options.AddPolicy("student", policy =>
+        {
+          policy.RequireClaim("admin", "true");
+        });
+        options.AddPolicy("lecture", policy =>
+        {
+          policy.RequireClaim("lecture", "trues");
+        });
+    });
   }
 }

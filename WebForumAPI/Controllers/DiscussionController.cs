@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Services;
 using Core.Entities;
 using Core.Requests;
@@ -66,23 +67,47 @@ public class DiscussionController : ControllerBase
   [HttpPatch("update/title/discussion")]
   public async Task<ActionResult> UpdateTitle([FromBody] DiscussionUpdateTitleRequest discussionRequest)
   {
-    await _service.UpdateTitle(discussionRequest.id, discussionRequest.Title);
-    return Ok($"Discussion updated, new title {discussionRequest.Title}");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var discussion = await _service.GetById(discussionRequest.id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == discussion.Creator.Id.ToString())
+    {
+      await _service.UpdateTitle(discussionRequest.id, discussionRequest.Title);
+      return Ok();
+    }
+
+    return Forbid();
   }
   
   [Authorize]
   [HttpPatch("update/content/discussion")]
   public async Task<ActionResult> UpdateContent([FromBody] DiscussionUpdateContentRequest discussionRequest)
   {
-    await _service.UpdateContent(discussionRequest.id, discussionRequest.Content);
-    return Ok($"Discussion updated, new content {discussionRequest.Content}");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var discussion = await _service.GetById(discussionRequest.id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == discussion.Creator.Id.ToString())
+    {
+      await _service.UpdateContent(discussionRequest.id, discussionRequest.Content);
+      return Ok();
+    }
+
+    return Forbid();
   }
 
-  [Authorize(Roles = "admin")]
+  [Authorize]
   [HttpDelete("delete/{id}")]
   public async Task<ActionResult> Delete(Guid id)
   {
-    await _service.Delete(id);
-    return Ok($"Discussion with {id}, deleted");
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var discussion = await _service.GetById(id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == discussion.Creator.Id.ToString())
+    {
+      await _service.Delete(id);
+      return Ok($"Discussion with {id}, deleted");
+    }
+
+    return Forbid();
   }
 }

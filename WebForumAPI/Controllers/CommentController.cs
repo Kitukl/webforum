@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Application.Services;
 using Core.Entities;
 using Core.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebForumAPI.Controllers;
@@ -17,6 +19,7 @@ public class CommentController : ControllerBase
     _commentService = commentService;
   }
   
+  [Authorize]
   [HttpPost("add/comment/{id}")]
   public async Task<ActionResult> Add([FromBody] CommentRequest commentRequest, [FromRoute] Guid id)
   {
@@ -48,15 +51,35 @@ public class CommentController : ControllerBase
     return Ok(await _commentService.GetByUser(id));
   }
 
+  [Authorize]
   [HttpDelete("delete/comment/id")]
-  public async Task Delete(Guid id)
+  public async Task<ActionResult> Delete(Guid id)
   {
-    await _commentService.Delete(id);
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var comment = await _commentService.GetById(id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == comment.Creator.Id.ToString())
+    {
+      await _commentService.Delete(id);
+      return Ok();
+    }
+
+    return Forbid();
   }
 
+  [Authorize]
   [HttpPatch]
-  public async Task Update([FromBody] Comment com)
+  public async Task<ActionResult> Update([FromBody] Comment com)
   {
-    await _commentService.Update(com.Id, com.Content);
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var comment = await _commentService.GetById(com.Id);
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    if (role == "admin" || userId == comment.Creator.Id.ToString())
+    {
+      await _commentService.Update(com.Id, com.Content);
+      return Ok();
+    }
+
+    return Forbid();
   }
 }

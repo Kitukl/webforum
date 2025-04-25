@@ -35,6 +35,17 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 builder.Services.AddScoped<IJWTProvider, JWTProvider>();
 builder.Services.AddDbContext<Context>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebForum")));
+
+builder.Services.AddCors(options =>
+{
+  options.AddDefaultPolicy(policy =>
+  {
+    policy.AllowAnyOrigin();
+    policy.AllowAnyHeader();
+    policy.AllowAnyMethod();
+  });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -45,6 +56,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
+
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
   MinimumSameSitePolicy = SameSiteMode.Strict,
@@ -52,6 +64,7 @@ app.UseCookiePolicy(new CookiePolicyOptions()
   Secure = CookieSecurePolicy.Always
 });
 
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.Run();
