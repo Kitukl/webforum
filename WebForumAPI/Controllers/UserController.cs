@@ -39,14 +39,14 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("users/id/{id}")]
-  public async Task<ActionResult<User>> GetById([FromQuery] Guid id)
+  public async Task<ActionResult<User>> GetById([FromRoute] Guid id)
   {
     var user = await _userService.GetById(id);
     return Ok(user);
   }
   
   [HttpGet("users/username/{username}")]
-  public async Task<ActionResult<User>> GetByUsername([FromQuery] string username)
+  public async Task<ActionResult<User>> GetByUsername([FromRoute] string username)
   {
     var user = await _userService.GetByUsername(username);
     return Ok(user);

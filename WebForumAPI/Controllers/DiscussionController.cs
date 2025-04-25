@@ -31,7 +31,7 @@ public class DiscussionController : ControllerBase
   }
   
   [HttpGet ("discussions/{id}")]
-  public async Task<ActionResult<List<Discussion>>> GetById(Guid id)
+  public async Task<ActionResult<List<Discussion>>> GetById([FromRoute] Guid id)
   {
     var discussion = await _service.GetById(id);
     if (!ModelState.IsValid)
@@ -43,7 +43,7 @@ public class DiscussionController : ControllerBase
   }
   
   [HttpGet ("discussions/by-title/{title}")]
-  public async Task<ActionResult<List<Discussion>>> GetByTitle(string title)
+  public async Task<ActionResult<List<Discussion>>> GetByTitle([FromRoute] string title)
   {
     var discussion = await _service.GetByTitle(title);
     if (!ModelState.IsValid)

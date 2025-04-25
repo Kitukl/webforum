@@ -1,5 +1,6 @@
 using Persistence.Contracts;
 using Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositiries;
 
@@ -10,38 +11,89 @@ public class CoursesReposotories : ICourseRepositories
   {
     _context = context;
   }
-  public Task Add(string title, string description,Guid creator, List<Guid> students, List<Guid> lessons, List<string> categories)
+  public async Task Add(string title, string description,Guid creator, List<string> categories)
   {
-    throw new NotImplementedException();
+    var course = new Course()
+    {
+      Id = Guid.NewGuid(),
+      Title = title,
+      Description = description,
+      Creator = await _context.Users
+        .FirstOrDefaultAsync(u => u.Id == creator),
+      Students = new(),
+      Lessons = new(),
+      Categories = categories
+    };
+
+    await _context.Courses
+      .AddAsync(course);
+    await _context.SaveChangesAsync();
   }
 
-  public Task<Course> GetById(Guid id)
+  public async Task<Course> GetById(Guid id)
   {
-    throw new NotImplementedException();
+    return await _context.Courses
+      .FirstOrDefaultAsync(c => c.Id == id) ?? throw new Exception("Course not found");
   }
 
-  public Task<List<Course>> Get()
+  public async Task<List<Course>> Get()
   {
-    throw new NotImplementedException();
+    return await _context.Courses
+      .Include(c => c.Lessons)
+      .Include(c => c.Creator)
+      .Include(c => c.Students)
+      .ToListAsync();
   }
 
-  public Task<List<Course>> GetByLector(Guid lectorId)
+  public async Task<List<Course>> GetByLector(Guid lectorId)
   {
-    throw new NotImplementedException();
+   return await _context.Courses
+     .Include(c => c.Lessons)
+     .Include(c => c.Creator)
+     .Include(c => c.Students)
+      .Where(c => c.Creator.Id == lectorId)
+      .ToListAsync();
   }
 
-  public Task<Course> GetByTitle(string title)
+  public async Task<Course> GetByTitle(string title)
   {
-    throw new NotImplementedException();
+    return await _context.Courses
+      .Include(c => c.Creator)
+      .Include(c => c.Lessons)
+      .Include(c => c.Students)
+      .FirstOrDefaultAsync(c => c.Title == title) ?? throw new Exception("Course not found");
   }
 
-  public Task<Course> Update()
+  public async Task UpdateTitle(Guid id, string title)
   {
-    throw new NotImplementedException();
+    await _context.Courses
+      .Where(c => c.Id == id)
+      .ExecuteUpdateAsync(s => s.SetProperty(c => c.Title, title));
+    await _context.SaveChangesAsync();
   }
 
-  public Task Delete(Guid id)
+  public async Task UpdateDescription(Guid id, string description)
   {
-    throw new NotImplementedException();
+    await _context.Courses
+      .Where(c => c.Id == id)
+      .ExecuteUpdateAsync(s => s.SetProperty(c => c.Description, description));
+    await _context.SaveChangesAsync();
+  }
+
+  public async Task UpdateCategories(Guid id, List<string> categories)
+  {
+    await _context.Courses
+      .Where(c => c.Id == id)
+      .ExecuteUpdateAsync(s => s.SetProperty(c => c.Categories, categories));
+    await _context.SaveChangesAsync();
+    
+  }
+
+  public async Task Delete(Guid id)
+  {
+    await _context.Courses
+      .Where(c => c.Id == id)
+      .ExecuteDeleteAsync();
+    await _context.SaveChangesAsync();
   }
 }

@@ -19,6 +19,9 @@ builder.Services.AddScoped<IDiscussionRepositories,DiscussionRepositories>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ICommentRepositories, CommentRepositories>();
 
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<ICourseRepositories, CoursesReposotories>();
+
 builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection(nameof(JWTOptions)));
 var jwtOptions = builder.Configuration.GetSection(nameof(JWTOptions)).Get<JWTOptions>();
 builder.Services.AddApiAuthentication(jwtOptions);

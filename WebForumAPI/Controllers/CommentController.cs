@@ -18,7 +18,7 @@ public class CommentController : ControllerBase
   }
   
   [HttpPost("add/comment/{id}")]
-  public async Task<ActionResult> Add([FromBody] CommentRequest commentRequest, [FromQuery] Guid id)
+  public async Task<ActionResult> Add([FromBody] CommentRequest commentRequest, [FromRoute] Guid id)
   {
     await _commentService.Add(commentRequest.Creator, id, commentRequest.Content);
     return Ok("Comment created");
@@ -31,7 +31,7 @@ public class CommentController : ControllerBase
   }
 
   [HttpGet("comments/{id}")]
-  public async Task<ActionResult<Comment>> GetById(Guid id)
+  public async Task<ActionResult<Comment>> GetById([FromRoute]Guid id)
   {
     return Ok(await _commentService.GetById(id));
   }
