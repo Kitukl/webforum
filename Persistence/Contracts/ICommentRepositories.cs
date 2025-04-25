@@ -9,6 +9,6 @@ public interface ICommentRepositories
   public Task<List<Comment>> Get();
   public Task<List<Comment>> GetByUser(Guid lectorId);
   public Task<Comment> GetByTitle(string title);
-  public Task<Comment> Update();
+  public Task Update(Guid id, string content);
   public Task Delete(Guid id);
 }
