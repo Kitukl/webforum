@@ -22,22 +22,7 @@ namespace WebForumAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CourseUser", b =>
-                {
-                    b.Property<Guid>("EnrolledCoursesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("StudentsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("EnrolledCoursesId", "StudentsId");
-
-                    b.HasIndex("StudentsId");
-
-                    b.ToTable("CourseUser");
-                });
-
-            modelBuilder.Entity("Persistence.Entities.Comment", b =>
+            modelBuilder.Entity("Core.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,7 +50,7 @@ namespace WebForumAPI.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Course", b =>
+            modelBuilder.Entity("Core.Entities.Course", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,7 +78,7 @@ namespace WebForumAPI.Migrations
                     b.ToTable("Courses", (string)null);
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Discussion", b =>
+            modelBuilder.Entity("Core.Entities.Discussion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +106,7 @@ namespace WebForumAPI.Migrations
                     b.ToTable("Discussions", (string)null);
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Lesson", b =>
+            modelBuilder.Entity("Core.Entities.Lesson", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,7 +129,7 @@ namespace WebForumAPI.Migrations
                     b.ToTable("Lessons", (string)null);
                 });
 
-            modelBuilder.Entity("Persistence.Entities.User", b =>
+            modelBuilder.Entity("Core.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -172,26 +157,26 @@ namespace WebForumAPI.Migrations
 
             modelBuilder.Entity("CourseUser", b =>
                 {
-                    b.HasOne("Persistence.Entities.Course", null)
-                        .WithMany()
-                        .HasForeignKey("EnrolledCoursesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("EnrolledCoursesId")
+                        .HasColumnType("uuid");
 
-                    b.HasOne("Persistence.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("StudentsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("EnrolledCoursesId", "StudentsId");
+
+                    b.HasIndex("StudentsId");
+
+                    b.ToTable("CourseUser");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Comment", b =>
+            modelBuilder.Entity("Core.Entities.Comment", b =>
                 {
-                    b.HasOne("Persistence.Entities.User", "Creator")
+                    b.HasOne("Core.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId");
 
-                    b.HasOne("Persistence.Entities.Discussion", "Discussion")
+                    b.HasOne("Core.Entities.Discussion", "Discussion")
                         .WithMany("Comments")
                         .HasForeignKey("DiscussionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -202,44 +187,59 @@ namespace WebForumAPI.Migrations
                     b.Navigation("Discussion");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Course", b =>
+            modelBuilder.Entity("Core.Entities.Course", b =>
                 {
-                    b.HasOne("Persistence.Entities.User", "Creator")
+                    b.HasOne("Core.Entities.User", "Creator")
                         .WithMany("CreatedCourses")
                         .HasForeignKey("CreatorId");
 
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Discussion", b =>
+            modelBuilder.Entity("Core.Entities.Discussion", b =>
                 {
-                    b.HasOne("Persistence.Entities.User", "Creator")
+                    b.HasOne("Core.Entities.User", "Creator")
                         .WithMany("Discussions")
                         .HasForeignKey("CreatorId");
 
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Lesson", b =>
+            modelBuilder.Entity("Core.Entities.Lesson", b =>
                 {
-                    b.HasOne("Persistence.Entities.Course", "Course")
+                    b.HasOne("Core.Entities.Course", "Course")
                         .WithMany("Lessons")
                         .HasForeignKey("CourseId");
 
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Course", b =>
+            modelBuilder.Entity("CourseUser", b =>
+                {
+                    b.HasOne("Core.Entities.Course", null)
+                        .WithMany()
+                        .HasForeignKey("EnrolledCoursesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("StudentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Entities.Course", b =>
                 {
                     b.Navigation("Lessons");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.Discussion", b =>
+            modelBuilder.Entity("Core.Entities.Discussion", b =>
                 {
                     b.Navigation("Comments");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.User", b =>
+            modelBuilder.Entity("Core.Entities.User", b =>
                 {
                     b.Navigation("CreatedCourses");
 

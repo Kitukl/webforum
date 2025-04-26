@@ -56,7 +56,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
-
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
   MinimumSameSitePolicy = SameSiteMode.Strict,

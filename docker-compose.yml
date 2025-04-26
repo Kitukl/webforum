@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: blablabla
+      POSTGRES_PASSWORD: blebleble
+      POSTGRES_DB: webforum_for_students
+    ports:
+      - "5430:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: WebForumAPI/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      WebForum: "Host=db;Port=5430;Database=webforum_for_students;Username=blablabla;Password=blebleble;"
+    depends_on:
+      - db
+    ports:
+      - "5000:8080"
+    volumes:
+      - ./wait-for-it.sh:/wait-for-it.sh
+    command: >
+      /bin/bash -c "chmod +x /wait-for-it.sh && /wait-for-it.sh db:5432 -- dotnet WebForumAPI.dll"
+volumes:
+  pgdata:
